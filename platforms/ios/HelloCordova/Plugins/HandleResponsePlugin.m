@@ -7,6 +7,7 @@
 //
 
 #import "HandleResponsePlugin.h"
+#import "AFHTTPRequestOperationManager.h"
 
 @implementation HandleResponsePlugin
 
@@ -23,16 +24,14 @@
     
     NSString *testUrl = @"http://private-54ee3-igzdanielmartinez.apiary-mock.com/notes";
     
-    NSURLSession *session = [NSURLSession sharedSession];
-    [[session dataTaskWithURL:[NSURL URLWithString:testUrl] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        
-        NSArray *JSON = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingAllowFragments error:&error];
-        NSLog(@"RESPONSE: -----\n%@", JSON);
-        
-        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:JSON];
+    AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+    [manager GET:testUrl parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSLog(@"ResponseObject: -----\n%@", responseObject);
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:responseObject];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:callbackId];
-        
-    }] resume];
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        NSLog(@"Error: %@", error);
+    }];
     
 }
 

@@ -28,6 +28,8 @@
 #import "MainViewController.h"
 
 #import "HandleResponsePlugin.h"
+#import "AFHTTPRequestOperationManager.h"
+
 
 @implementation MainViewController
 
@@ -125,11 +127,32 @@
     return [super webView:theWebView didFailLoadWithError:error];
 }
 
+*/
+
 - (BOOL) webView:(UIWebView*)theWebView shouldStartLoadWithRequest:(NSURLRequest*)request navigationType:(UIWebViewNavigationType)navigationType
 {
+    NSLog(@"Request: %@", request);
+    
+    // Cuando entremos en determinada vista de la interfaz, hacemos una llamada que traerá nuevos datos.
+    if ([request.URL.description rangeOfString:@"search"].location != NSNotFound)
+    {
+        NSString *testUrl = @"http://private-54ee3-igzdanielmartinez.apiary-mock.com/notes";
+        NSDictionary *params    = @{
+                                    @"title"  : @"Buy cheese and bread for breakfast."
+                                    };
+        
+        AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
+        
+        [manager POST:testUrl parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
+            NSLog(@"JSON: %@", responseObject);
+        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            NSLog(@"Error: %@", error);
+        }];
+    }
+    
     return [super webView:theWebView shouldStartLoadWithRequest:request navigationType:navigationType];
 }
-*/
+
 
 @end
 
